@@ -101,13 +101,15 @@ function t(key, defaultText) {
 }
 
 function applyI18n() {
-    $('[data-i18n]').each(function() {
+    const $container = $('.clavis-salomonis-settings');
+    
+    $container.find('[data-i18n]').each(function() {
         const key = $(this).attr('data-i18n');
         const defaultText = $(this).text();
         $(this).text(t(key, defaultText));
     });
     
-    $('[data-i18n-value]').each(function() {
+    $container.find('[data-i18n-value]').each(function() {
         const key = $(this).attr('data-i18n-value');
         const defaultText = $(this).attr('value');
         const icon = defaultText.match(/^[^\s]+\s*/)?.[0] || '';
@@ -115,7 +117,7 @@ function applyI18n() {
         $(this).attr('value', icon + text);
     });
     
-    $('[data-i18n-title]').each(function() {
+    $container.find('[data-i18n-title]').each(function() {
         const key = $(this).attr('data-i18n-title');
         const defaultText = $(this).attr('title');
         $(this).attr('title', t(key, defaultText));
