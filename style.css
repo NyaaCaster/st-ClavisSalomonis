@@ -176,3 +176,11 @@
 .clavis_block.preset-overlap label small {
     color: #e74c3c;
 }
+
+.clavis-salomonis-settings .menu_button_icon {
+    flex: 0;
+    min-width: 32px;
+    padding: 2px 6px;
+    font-size: 12px;
+    margin-left: auto;
+}
