@@ -6,7 +6,7 @@
     "js": "index.js",
     "css": "style.css",
     "author": "NyaaCaster",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "homePage": "https://github.com/NyaaCaster/st-ClavisSalomonis",
     "auto_update": true,
     "minimum_client_version": "1.10.0",

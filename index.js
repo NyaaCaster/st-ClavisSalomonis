@@ -130,13 +130,22 @@ async function checkForUpdate() {
     }
     
     const remoteVersion = await getLatestVersion();
+    const $statusEl = $('#clavis_remote_version_status');
+    
     if (remoteVersion && currentVersion) {
         hasUpdateAvailable = compareVersions(remoteVersion, currentVersion) > 0;
         console.log(`[${MODULE_NAME}] Version check: local=${currentVersion}, remote=${remoteVersion}, hasUpdate=${hasUpdateAvailable}`);
+        
         if (hasUpdateAvailable) {
             showUpdateBadge();
+            $statusEl.html(`<span style="color: #e74c3c;">最新: ${remoteVersion}</span>`);
+        } else {
+            $statusEl.html(`<span style="color: #2ecc71;">已是最新版本</span>`);
         }
+    } else {
+        $statusEl.html(`<span style="color: #888;">版本检查失败</span>`);
     }
+    
     return hasUpdateAvailable;
 }
 
