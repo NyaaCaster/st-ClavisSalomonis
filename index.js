@@ -1,7 +1,7 @@
 import { extension_settings, getContext, loadExtensionSettings } from "../../../extensions.js";
 import { saveSettingsDebounced } from "../../../../script.js";
 
-const MODULE_NAME = 'ClavisSalomonis';
+const MODULE_NAME = 'st-ClavisSalomonis';
 const extensionFolderPath = `scripts/extensions/third-party/${MODULE_NAME}`;
 const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/NyaaCaster/st-ClavisSalomonis/main/manifest.json';
 
@@ -124,6 +124,11 @@ async function getLatestVersion() {
 
 async function checkForUpdate() {
     await getLocalVersion();
+    
+    if (currentVersion) {
+        $('#clavis_version_number').text(currentVersion);
+    }
+    
     const remoteVersion = await getLatestVersion();
     if (remoteVersion && currentVersion) {
         hasUpdateAvailable = compareVersions(remoteVersion, currentVersion) > 0;
