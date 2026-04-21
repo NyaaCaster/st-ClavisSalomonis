@@ -1,9 +1,6 @@
 # ClavisSalomonis - SillyTavern Content Moderation Bypass Extension Framework
 
-[![GitHub release](https://img.shields.io/github/v/release/NyaaCaster/st-ClavisSalomonis?label=Version&color=blue)](https://github.com/NyaaCaster/st-ClavisSalomonis/releases)
-[![GitHub license](https://img.shields.io/github/license/NyaaCaster/st-ClavisSalomonis?label=License&color=green)](LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/NyaaCaster/st-ClavisSalomonis?label=Stars&color=yellow)](https://github.com/NyaaCaster/st-ClavisSalomonis/stargazers)
-[![GitHub issues](https://img.shields.io/github/issues/NyaaCaster/st-ClavisSalomonis?label=Issues&color=red)](https://github.com/NyaaCaster/st-ClavisSalomonis/issues)
+[![License](https://img.shields.io/badge/License-AGPL--3.0-green)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-SillyTavern-purple?logo=windowsterminal)](https://github.com/SillyTavern/SillyTavern)
 
 [中文文档](./README.md) | English
