@@ -3,9 +3,9 @@ import { saveSettingsDebounced } from "../../../../script.js";
 
 const MODULE_NAME = 'ClavisSalomonis';
 const extensionFolderPath = `scripts/extensions/third-party/${MODULE_NAME}`;
-const CURRENT_VERSION = '1.0.1';
 const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/NyaaCaster/st-ClavisSalomonis/main/manifest.json';
 
+let currentVersion = null;
 let hasUpdateAvailable = false;
 let latestVersion = null;
 let presetDetectionResult = null;
@@ -62,7 +62,7 @@ const defaultSettings = Object.freeze({
     enableRoleplayInduction: true,
     enableDisclaimer: false,
     enableSafetyStatement: true,
-    enableWordCountControl: false,
+    enableWordCountControl: true,
     injectionDepth: 4,
     injectionPosition: 0,
     injectionOrder: 100,
@@ -91,6 +91,22 @@ function compareVersions(v1, v2) {
     return 0;
 }
 
+async function getLocalVersion() {
+    try {
+        const response = await fetch(`/scripts/extensions/third-party/${MODULE_NAME}/manifest.json`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const manifest = await response.json();
+        currentVersion = manifest.version;
+        return currentVersion;
+    } catch (error) {
+        console.error(`[${MODULE_NAME}] Failed to fetch local version:`, error);
+        currentVersion = '0.0.0';
+        return currentVersion;
+    }
+}
+
 async function getLatestVersion() {
     try {
         const response = await fetch(GITHUB_RAW_URL);
@@ -107,10 +123,11 @@ async function getLatestVersion() {
 }
 
 async function checkForUpdate() {
+    await getLocalVersion();
     const remoteVersion = await getLatestVersion();
-    if (remoteVersion) {
-        hasUpdateAvailable = compareVersions(remoteVersion, CURRENT_VERSION) > 0;
-        console.log(`[${MODULE_NAME}] Version check: local=${CURRENT_VERSION}, remote=${remoteVersion}, hasUpdate=${hasUpdateAvailable}`);
+    if (remoteVersion && currentVersion) {
+        hasUpdateAvailable = compareVersions(remoteVersion, currentVersion) > 0;
+        console.log(`[${MODULE_NAME}] Version check: local=${currentVersion}, remote=${remoteVersion}, hasUpdate=${hasUpdateAvailable}`);
         if (hasUpdateAvailable) {
             showUpdateBadge();
         }
@@ -145,7 +162,7 @@ function detectPresetOverlap() {
     
     if (preset.prompts && Array.isArray(preset.prompts)) {
         for (const prompt of preset.prompts) {
-            if (!prompt.content || !prompt.enabled !== false) continue;
+            if (!prompt.content || prompt.enabled === false) continue;
             
             for (const [key, rule] of Object.entries(PRESET_OVERLAP_RULES.prompts)) {
                 for (const keyword of rule.keywords) {
@@ -285,11 +302,16 @@ async function loadTemplateConfig() {
     
     regexPatterns = {};
     for (const [key, value] of Object.entries(templateConfig.regexPatterns)) {
-        regexPatterns[key] = {
-            name: value.name,
-            pattern: new RegExp(value.pattern, value.flags),
-            description: value.description
-        };
+        try {
+            regexPatterns[key] = {
+                name: value.name,
+                pattern: new RegExp(value.pattern, value.flags),
+                description: value.description
+            };
+        } catch (error) {
+            console.error(`[${MODULE_NAME}] Failed to compile regex pattern '${key}':`, error);
+            toastr.error(`Invalid regex pattern: ${key}`, 'Template Error');
+        }
     }
     
     bypassTemplates = {};

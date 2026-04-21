@@ -76,7 +76,7 @@
             "name": "字数控制",
             "configKey": "enableWordCountControl",
             "role": "system",
-            "defaultEnabled": false,
+            "defaultEnabled": true,
             "description": "要求AI生成的文本长度在1000至2000字左右",
             "content": "[Word Count Requirement]\n请确保每次回复的内容长度在1000至2000字左右，保持内容的丰富性和完整性。"
         }
