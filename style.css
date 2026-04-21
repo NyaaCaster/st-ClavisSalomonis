@@ -1,0 +1,121 @@
+.clavis-salomonis-settings {
+    margin-bottom: 10px;
+}
+
+.clavis-salomonis-settings .clavis_block {
+    margin: 10px 0;
+}
+
+.clavis-salomonis-settings .clavis_block.flex-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.clavis-salomonis-settings .clavis_block label {
+    cursor: pointer;
+}
+
+.clavis-salomonis-settings .clavis_help {
+    display: block;
+    color: #888;
+    font-size: 0.85em;
+    margin-top: 5px;
+}
+
+.clavis-salomonis-settings h4 {
+    margin: 10px 0;
+    color: #4ecdc4;
+    font-size: 1em;
+}
+
+.clavis-salomonis-settings .clavis_info {
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(78, 205, 196, 0.1);
+    border-radius: 5px;
+    border-left: 3px solid #4ecdc4;
+}
+
+.clavis-salomonis-settings .clavis_info small {
+    display: block;
+    line-height: 1.6;
+}
+
+.clavis-salomonis-settings .clavis_info a {
+    color: #4ecdc4;
+    text-decoration: none;
+}
+
+.clavis-salomonis-settings .clavis_info a:hover {
+    text-decoration: underline;
+}
+
+.clavis-salomonis-settings .menu_button {
+    flex: 1;
+    margin: 5px;
+}
+
+.clavis-salomonis-settings select.text_pole {
+    width: 100%;
+    margin-top: 5px;
+}
+
+.clavis-salomonis-settings input[type="text"],
+.clavis-salomonis-settings input[type="number"] {
+    width: 100%;
+    margin-top: 5px;
+}
+
+.clavis-salomonis-settings .inline-drawer-content {
+    padding: 10px;
+}
+
+.clavis-salomonis-settings hr.sysHR {
+    margin: 15px 0;
+    border: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#clavis_emotional_options,
+#clavis_technical_options {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.clavis-new-badge {
+    display: none;
+    background-color: #e74c3c;
+    color: white;
+    font-size: 0.65em;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 8px;
+    vertical-align: middle;
+    text-transform: uppercase;
+    animation: pulse 2s infinite;
+}
+
+.clavis-new-badge.show {
+    display: inline-block;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}

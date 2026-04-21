@@ -1,0 +1,20 @@
+{
+    "display_name": "ClavisSalomonis",
+    "loading_order": 10,
+    "requires": [],
+    "optional": [],
+    "js": "index.js",
+    "css": "style.css",
+    "author": "NyaaCaster",
+    "version": "1.0.1",
+    "homePage": "https://github.com/NyaaCaster/st-ClavisSalomonis",
+    "auto_update": true,
+    "minimum_client_version": "1.10.0",
+    "generate_interceptor": "clavisSalomonisInterceptor",
+    "hooks": {
+        "install": "onInstall",
+        "activate": "onActivate",
+        "enable": "onEnable",
+        "disable": "onDisable"
+    }
+}

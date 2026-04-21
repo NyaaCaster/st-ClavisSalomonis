@@ -1,0 +1,44 @@
+# 排除文档目录
+.Doc/
+
+# 排除预设目录
+.preset/
+
+# Node modules
+node_modules/
+
+# 环境变量
+.env
+.env.local
+.env.*.local
+
+# 日志文件
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 编辑器目录和文件
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+
+# 临时文件
+*.tmp
+*.temp
+.cache/
+
+# 构建输出
+dist/
+build/
+out/
+
+# 依赖锁文件（可选，根据项目需求）
+# package-lock.json
+# yarn.lock
