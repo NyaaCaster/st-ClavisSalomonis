@@ -3,7 +3,7 @@ import { saveSettingsDebounced } from "../../../../script.js";
 
 const MODULE_NAME = 'st-ClavisSalomonis';
 const extensionFolderPath = `scripts/extensions/third-party/${MODULE_NAME}`;
-const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/NyaaCaster/st-ClavisSalomonis/main/manifest.json';
+const GITHUB_API_URL = 'https://api.github.com/repos/NyaaCaster/st-ClavisSalomonis/contents/manifest.json';
 
 let currentVersion = null;
 let hasUpdateAvailable = false;
@@ -154,11 +154,17 @@ async function getLocalVersion() {
 
 async function getLatestVersion() {
     try {
-        const response = await fetch(GITHUB_RAW_URL);
+        const response = await fetch(GITHUB_API_URL, {
+            headers: {
+                'Accept': 'application/vnd.github.v3+json'
+            }
+        });
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const manifest = await response.json();
+        const data = await response.json();
+        const content = atob(data.content);
+        const manifest = JSON.parse(content);
         latestVersion = manifest.version;
         return latestVersion;
     } catch (error) {
