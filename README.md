@@ -767,6 +767,5 @@ Token消耗: 低
 
 ---
 
-**版本**: 见 [manifest.json](manifest.json)  
 **作者**: [NyaaCaster](https://github.com/NyaaCaster)  
 **最后更新**: 2026-04-22

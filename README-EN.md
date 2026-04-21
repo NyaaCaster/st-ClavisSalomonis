@@ -376,6 +376,5 @@ This project is licensed under AGPLv3 - see [LICENSE](LICENSE) file for details
 
 ---
 
-**Version**: See [manifest.json](manifest.json)  
 **Author**: [NyaaCaster](https://github.com/NyaaCaster)  
 **Last Updated**: 2026-04-22
