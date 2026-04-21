@@ -119,3 +119,60 @@
         opacity: 0.7;
     }
 }
+
+.clavis_preset_warning {
+    margin: 10px 0;
+    padding: 12px;
+    background: rgba(231, 76, 60, 0.15);
+    border-radius: 5px;
+    border-left: 3px solid #e74c3c;
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+
+.clavis_preset_warning strong {
+    color: #e74c3c;
+}
+
+.clavis_preset_warning ul {
+    margin: 5px 0;
+    padding-left: 20px;
+}
+
+.clavis_preset_warning li {
+    margin: 3px 0;
+}
+
+.clavis_preset_warning code {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: monospace;
+}
+
+.clavis_preset_info {
+    margin: 10px 0;
+    padding: 10px;
+    background: rgba(46, 204, 113, 0.15);
+    border-radius: 5px;
+    border-left: 3px solid #2ecc71;
+    font-size: 0.9em;
+}
+
+.clavis_preset_info code {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: monospace;
+}
+
+.clavis_block.preset-overlap {
+    background: rgba(231, 76, 60, 0.1);
+    border-radius: 5px;
+    padding: 5px 10px;
+    margin: 5px 0;
+}
+
+.clavis_block.preset-overlap label small {
+    color: #e74c3c;
+}

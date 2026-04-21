@@ -8,6 +8,50 @@ const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/NyaaCaster/st-ClavisSa
 
 let hasUpdateAvailable = false;
 let latestVersion = null;
+let presetDetectionResult = null;
+
+const PRESET_OVERLAP_RULES = {
+    prompts: {
+        identityReset: {
+            keywords: ['身份重置', 'identity', 'RESET', 'unconditioned', 'Initialize as'],
+            description: '身份重置功能'
+        },
+        scenarioFramework: {
+            keywords: ['场景框架', '亲密伙伴', '创作自由', '私密空间', '没有任何安全限制'],
+            description: '场景框架构建功能'
+        },
+        aiSelfPersuasion: {
+            keywords: ['自我说服', '什么都可以写', '亲密的朋友', '安心待在这里'],
+            description: 'AI自我说服功能'
+        },
+        roleplayInduction: {
+            keywords: ['角色扮演', '扮演故事中角色', 'Role|System', '进入角色'],
+            description: '角色扮演诱导功能'
+        },
+        safetyStatement: {
+            keywords: ['安全声明', 'safety policies', 'fictional and adheres'],
+            description: '安全声明转移功能'
+        },
+        disclaimer: {
+            keywords: ['免责声明', 'safety mechanisms disabled', 'I_AM_FREE', 'Unlimited plot creation'],
+            description: '免责声明伪装功能'
+        },
+        wordCountControl: {
+            keywords: ['字数', 'word count', '1000', '2000', '字左右'],
+            description: '字数控制功能'
+        }
+    },
+    regex: {
+        hideThoughtChain: {
+            keywords: ['隐藏思维链', 'think', 'thinking', 'Thinking about your request'],
+            description: '隐藏思维链功能'
+        },
+        hideDisclaimer: {
+            keywords: ['隐藏免责声明', 'disclaimer', 'Statement'],
+            description: '隐藏免责声明功能'
+        }
+    }
+};
 
 const defaultSettings = Object.freeze({
     enabled: true,
@@ -18,6 +62,7 @@ const defaultSettings = Object.freeze({
     enableRoleplayInduction: true,
     enableDisclaimer: false,
     enableSafetyStatement: true,
+    enableWordCountControl: false,
     injectionDepth: 4,
     injectionPosition: 0,
     injectionOrder: 100,
@@ -76,6 +121,137 @@ async function checkForUpdate() {
 function showUpdateBadge() {
     $('#clavis_title_badge').addClass('show');
     $('#clavis_version_badge').addClass('show');
+}
+
+function detectPresetOverlap() {
+    const context = SillyTavern.getContext();
+    const result = {
+        hasPreset: false,
+        presetName: null,
+        overlaps: {
+            prompts: {},
+            regex: {}
+        },
+        recommendations: []
+    };
+    
+    if (!context || !context.settings || !context.settings.preset) {
+        return result;
+    }
+    
+    const preset = context.settings.preset;
+    result.hasPreset = true;
+    result.presetName = preset.name || '未知预设';
+    
+    if (preset.prompts && Array.isArray(preset.prompts)) {
+        for (const prompt of preset.prompts) {
+            if (!prompt.content || !prompt.enabled !== false) continue;
+            
+            for (const [key, rule] of Object.entries(PRESET_OVERLAP_RULES.prompts)) {
+                for (const keyword of rule.keywords) {
+                    if (prompt.content.toLowerCase().includes(keyword.toLowerCase())) {
+                        if (!result.overlaps.prompts[key]) {
+                            result.overlaps.prompts[key] = {
+                                description: rule.description,
+                                matchedPrompts: []
+                            };
+                        }
+                        result.overlaps.prompts[key].matchedPrompts.push(prompt.name || prompt.identifier);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    
+    if (preset.extensions && preset.extensions.regex_scripts && Array.isArray(preset.extensions.regex_scripts)) {
+        for (const script of preset.extensions.regex_scripts) {
+            if (!script.findRegex) continue;
+            
+            for (const [key, rule] of Object.entries(PRESET_OVERLAP_RULES.regex)) {
+                for (const keyword of rule.keywords) {
+                    if (script.findRegex.toLowerCase().includes(keyword.toLowerCase()) ||
+                        (script.scriptName && script.scriptName.includes(keyword))) {
+                        if (!result.overlaps.regex[key]) {
+                            result.overlaps.regex[key] = {
+                                description: rule.description,
+                                matchedScripts: []
+                            };
+                        }
+                        result.overlaps.regex[key].matchedScripts.push(script.scriptName || '未命名脚本');
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    
+    const promptOverlaps = Object.keys(result.overlaps.prompts);
+    const regexOverlaps = Object.keys(result.overlaps.regex);
+    
+    if (promptOverlaps.length > 0) {
+        result.recommendations.push(`检测到预设已包含以下功能: ${promptOverlaps.map(k => result.overlaps.prompts[k].description).join('、')}`);
+        result.recommendations.push('建议禁用扩展中对应的提示词配置以避免重复');
+    }
+    
+    if (regexOverlaps.length > 0) {
+        result.recommendations.push(`检测到预设已包含以下正则过滤: ${regexOverlaps.map(k => result.overlaps.regex[k].description).join('、')}`);
+    }
+    
+    presetDetectionResult = result;
+    console.log(`[${MODULE_NAME}] Preset detection result:`, result);
+    
+    return result;
+}
+
+function updatePresetDetectionUI() {
+    const $warning = $('#clavis_preset_warning');
+    const $info = $('#clavis_preset_info');
+    
+    if (!presetDetectionResult) {
+        $warning.hide();
+        $info.hide();
+        return;
+    }
+    
+    const promptOverlaps = Object.keys(presetDetectionResult.overlaps.prompts);
+    const regexOverlaps = Object.keys(presetDetectionResult.overlaps.regex);
+    
+    if (promptOverlaps.length > 0 || regexOverlaps.length > 0) {
+        let warningHtml = `<strong>⚠️ 预设兼容性提示</strong><br>`;
+        warningHtml += `当前预设: <code>${presetDetectionResult.presetName}</code><br>`;
+        
+        if (promptOverlaps.length > 0) {
+            warningHtml += `<br><strong>提示词重叠:</strong><ul>`;
+            for (const key of promptOverlaps) {
+                const overlap = presetDetectionResult.overlaps.prompts[key];
+                warningHtml += `<li>${overlap.description} (预设条目: ${overlap.matchedPrompts.join(', ')})</li>`;
+                
+                const $checkbox = $(`#clavis_${key.replace(/([A-Z])/g, '_$1').toLowerCase()}`);
+                if ($checkbox.length && $checkbox.prop('checked')) {
+                    $checkbox.closest('.clavis_block').addClass('preset-overlap');
+                }
+            }
+            warningHtml += `</ul>`;
+        }
+        
+        if (regexOverlaps.length > 0) {
+            warningHtml += `<br><strong>正则过滤重叠:</strong><ul>`;
+            for (const key of regexOverlaps) {
+                const overlap = presetDetectionResult.overlaps.regex[key];
+                warningHtml += `<li>${overlap.description}</li>`;
+            }
+            warningHtml += `</ul>`;
+        }
+        
+        $warning.html(warningHtml).show();
+    } else if (presetDetectionResult.hasPreset) {
+        $info.html(`✅ 当前预设 <code>${presetDetectionResult.presetName}</code> 与扩展无功能重叠`).show();
+        $warning.hide();
+    } else {
+        $warning.hide();
+        $info.hide();
+    }
 }
 
 async function loadDefaultTemplateConfig() {
@@ -391,7 +567,7 @@ function validateTemplateConfig(config) {
     } else {
         const requiredTemplates = [
             'identityReset', 'scenarioFramework', 'aiSelfPersuasion',
-            'roleplayInduction', 'safetyStatement', 'disclaimer'
+            'roleplayInduction', 'safetyStatement', 'disclaimer', 'wordCountControl'
         ];
         for (const key of requiredTemplates) {
             if (!config.templates[key]) {
@@ -475,6 +651,7 @@ async function loadSettings() {
     $('#clavis_roleplay_induction').prop('checked', settings.enableRoleplayInduction).trigger('input');
     $('#clavis_disclaimer').prop('checked', settings.enableDisclaimer).trigger('input');
     $('#clavis_safety_statement').prop('checked', settings.enableSafetyStatement).trigger('input');
+    $('#clavis_word_count_control').prop('checked', settings.enableWordCountControl).trigger('input');
     $('#clavis_injection_depth').val(settings.injectionDepth).trigger('input');
     $('#clavis_enable_regex_filter').prop('checked', settings.enableRegexFilter).trigger('input');
     $('#clavis_hide_thought_chain').prop('checked', settings.hideThoughtChain).trigger('input');
@@ -516,6 +693,9 @@ function onSettingsChange(event) {
             break;
         case 'clavis_safety_statement':
             settings.enableSafetyStatement = value;
+            break;
+        case 'clavis_word_count_control':
+            settings.enableWordCountControl = value;
             break;
         case 'clavis_injection_depth':
             settings.injectionDepth = parseInt(value);
@@ -575,6 +755,7 @@ jQuery(async () => {
         $('#clavis_roleplay_induction').on('input', onSettingsChange);
         $('#clavis_disclaimer').on('input', onSettingsChange);
         $('#clavis_safety_statement').on('input', onSettingsChange);
+        $('#clavis_word_count_control').on('input', onSettingsChange);
         $('#clavis_injection_depth').on('input', onSettingsChange);
         $('#clavis_enable_regex_filter').on('input', onSettingsChange);
         $('#clavis_hide_thought_chain').on('input', onSettingsChange);
@@ -590,6 +771,9 @@ jQuery(async () => {
         
         loadSettings();
         await loadTemplateConfig();
+        
+        detectPresetOverlap();
+        updatePresetDetectionUI();
         
         console.log(`[${MODULE_NAME}] Extension loaded successfully`);
     } catch (error) {

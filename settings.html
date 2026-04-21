@@ -12,6 +12,9 @@
                 </label>
             </div>
 
+            <div id="clavis_preset_warning" class="clavis_preset_warning" style="display: none;"></div>
+            <div id="clavis_preset_info" class="clavis_preset_info" style="display: none;"></div>
+
             <hr class="sysHR" />
             <h4>📋 模板模式</h4>
             
@@ -61,6 +64,11 @@
                 <div class="clavis_block">
                     <label><small>免责声明伪装</small></label>
                     <textarea id="clavis_template_disclaimer" class="text_pole" rows="3"></textarea>
+                </div>
+                
+                <div class="clavis_block">
+                    <label><small>字数控制</small></label>
+                    <textarea id="clavis_template_wordCountControl" class="text_pole" rows="3"></textarea>
                 </div>
                 
                 <div class="clavis_block flex-container">
@@ -116,6 +124,13 @@
                 <input id="clavis_disclaimer" type="checkbox" />
                 <label for="clavis_disclaimer">
                     <small data-i18n="Disclaimer">免责声明伪装技术</small>
+                </label>
+            </div>
+            
+            <div class="clavis_block flex-container">
+                <input id="clavis_word_count_control" type="checkbox" />
+                <label for="clavis_word_count_control">
+                    <small data-i18n="Word Count Control">字数控制 (1000-2000字)</small>
                 </label>
             </div>
 
