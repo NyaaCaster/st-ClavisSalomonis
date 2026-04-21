@@ -69,13 +69,58 @@ const defaultSettings = Object.freeze({
     enableRegexFilter: true,
     hideThoughtChain: true,
     hideDisclaimer: true,
-    customTemplates: null
+    customTemplates: null,
+    language: 'zh-cn'
 });
 
 let defaultTemplateConfig = null;
 let templateConfig = null;
 let regexPatterns = null;
 let bypassTemplates = null;
+let i18nData = null;
+
+async function loadI18n(lang) {
+    try {
+        const response = await fetch(`/scripts/extensions/third-party/${MODULE_NAME}/i18n/${lang}.json`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        i18nData = await response.json();
+        return i18nData;
+    } catch (error) {
+        console.error(`[${MODULE_NAME}] Failed to load i18n for ${lang}:`, error);
+        return null;
+    }
+}
+
+function t(key, defaultText) {
+    if (i18nData && i18nData[key]) {
+        return i18nData[key];
+    }
+    return defaultText || key;
+}
+
+function applyI18n() {
+    $('[data-i18n]').each(function() {
+        const key = $(this).attr('data-i18n');
+        const defaultText = $(this).text();
+        $(this).text(t(key, defaultText));
+    });
+    
+    $('[data-i18n-value]').each(function() {
+        const key = $(this).attr('data-i18n-value');
+        const defaultText = $(this).attr('value');
+        const icon = defaultText.match(/^[^\s]+\s*/)?.[0] || '';
+        const text = t(key, defaultText.replace(/^[^\s]+\s*/, ''));
+        $(this).attr('value', icon + text);
+    });
+    
+    $('[data-i18n-title]').each(function() {
+        const key = $(this).attr('data-i18n-title');
+        const defaultText = $(this).attr('title');
+        $(this).attr('title', t(key, defaultText));
+    });
+}
 
 function compareVersions(v1, v2) {
     const parts1 = v1.split('.').map(Number);
@@ -751,6 +796,19 @@ function onSettingsChange(event) {
     console.log(`[${MODULE_NAME}] Settings updated: ${id} = ${value}`);
 }
 
+async function onLanguageChange(event) {
+    const settings = getSettings();
+    const newLang = $(event.target).val();
+    
+    settings.language = newLang;
+    saveSettingsDebounced();
+    
+    await loadI18n(newLang);
+    applyI18n();
+    
+    console.log(`[${MODULE_NAME}] Language changed to: ${newLang}`);
+}
+
 async function onEditRegex(regexKey) {
     const { Popup, POPUP_TYPE, POPUP_RESULT } = SillyTavern.getContext();
     
@@ -983,8 +1041,15 @@ jQuery(async () => {
         $('#clavis_edit_thought_chain').on('click', () => onEditRegex('hideThoughtChain'));
         $('#clavis_edit_disclaimer').on('click', () => onEditRegex('hideDisclaimer'));
         
+        $('#clavis_language').on('change', onLanguageChange);
+        
         loadSettings();
         await loadTemplateConfig();
+        
+        const settings = getSettings();
+        await loadI18n(settings.language || 'zh-cn');
+        applyI18n();
+        $(`#clavis_language`).val(settings.language || 'zh-cn');
         
         detectPresetOverlap();
         updatePresetDetectionUI();

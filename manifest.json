@@ -6,11 +6,15 @@
     "js": "index.js",
     "css": "style.css",
     "author": "NyaaCaster",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "homePage": "https://github.com/NyaaCaster/st-ClavisSalomonis",
     "auto_update": true,
     "minimum_client_version": "1.10.0",
     "generate_interceptor": "clavisSalomonisInterceptor",
+    "i18n": {
+        "zh-cn": "i18n/zh-cn.json",
+        "en": "i18n/en.json"
+    },
     "hooks": {
         "install": "onInstall",
         "activate": "onActivate",
