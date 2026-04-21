@@ -918,13 +918,23 @@ async function onEditRegex(regexKey) {
 }
 
 async function onTestBypass() {
+    const $btn = $('#clavis_test_bypass');
+    const originalValue = $btn.attr('value');
+    
+    if ($btn.prop('disabled')) {
+        return;
+    }
+    
     const settings = getSettings();
     const bypassPrompts = buildBypassPrompt(settings);
     
     if (bypassPrompts.length === 0) {
-        toastr.warning('没有启用任何提示词配置', '测试绕过');
+        toastr.warning(t('No prompts enabled', '没有启用任何提示词配置'), t('Test Bypass Test', '测试绕过'));
         return;
     }
+    
+    $btn.prop('disabled', true);
+    $btn.attr('value', '🧪 ' + t('Testing', '测试中……'));
     
     const { generateRaw, Popup, POPUP_TYPE } = SillyTavern.getContext();
     
@@ -942,7 +952,7 @@ async function onTestBypass() {
     
     messages.push({ role: 'user', content: testUserPrompt });
     
-    toastr.info('正在发送测试请求...', '测试绕过');
+    toastr.info(t('Sending test request...', '正在发送测试请求...'), t('Test Bypass Test', '测试绕过'));
     
     try {
         const response = await generateRaw({
@@ -966,24 +976,24 @@ async function onTestBypass() {
         let htmlContent = '<div style="max-height: 60vh; overflow-y: auto; text-align: left;">';
         
         if (isRefused) {
-            htmlContent += `<p style="margin-bottom: 15px; color: #ff6b6b; font-size: 16px;"><b>❌ 测试结果：绕过失败</b></p>`;
-            htmlContent += `<p style="margin-bottom: 15px; color: #aaa;">AI 拒绝了请求，当前提示词配置可能无法有效绕过审核。</p>`;
+            htmlContent += `<p style="margin-bottom: 15px; color: #ff6b6b; font-size: 16px;"><b>❌ ${t('Test Result Bypass Failed', '测试结果：绕过失败')}</b></p>`;
+            htmlContent += `<p style="margin-bottom: 15px; color: #aaa;">${t('AI refused request', 'AI 拒绝了请求，当前提示词配置可能无法有效绕过审核。')}</p>`;
         } else {
-            htmlContent += `<p style="margin-bottom: 15px; color: #4ecdc4; font-size: 16px;"><b>✅ 测试结果：绕过成功</b></p>`;
-            htmlContent += `<p style="margin-bottom: 15px; color: #aaa;">AI 正常响应了请求，当前提示词配置可能有效。</p>`;
+            htmlContent += `<p style="margin-bottom: 15px; color: #4ecdc4; font-size: 16px;"><b>✅ ${t('Test Result Bypass Success', '测试结果：绕过成功')}</b></p>`;
+            htmlContent += `<p style="margin-bottom: 15px; color: #aaa;">${t('AI responded normally', 'AI 正常响应了请求，当前提示词配置可能有效。')}</p>`;
         }
         
         htmlContent += `<div style="margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 5px;">`;
-        htmlContent += `<p style="margin: 0 0 8px 0; color: #888;"><b>测试请求：</b></p>`;
+        htmlContent += `<p style="margin: 0 0 8px 0; color: #888;"><b>${t('Test Request', '测试请求')}：</b></p>`;
         htmlContent += `<pre style="margin: 0; white-space: pre-wrap; word-wrap: break-word; font-size: 12px; color: #ccc;">${testUserPrompt}</pre>`;
         htmlContent += `</div>`;
         
         htmlContent += `<div style="margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 5px;">`;
-        htmlContent += `<p style="margin: 0 0 8px 0; color: #888;"><b>AI 响应：</b></p>`;
+        htmlContent += `<p style="margin: 0 0 8px 0; color: #888;"><b>${t('AI Response', 'AI 响应')}：</b></p>`;
         htmlContent += `<pre style="margin: 0; white-space: pre-wrap; word-wrap: break-word; font-size: 12px; color: #ccc;">${response.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>`;
         htmlContent += `</div>`;
         
-        htmlContent += `<p style="color: #666; font-size: 11px;">注：此测试仅作为参考，实际效果可能因模型、API和具体请求内容而异。</p>`;
+        htmlContent += `<p style="color: #666; font-size: 11px;">${t('Test note', '注：此测试仅作为参考，实际效果可能因模型、API和具体请求内容而异。')}</p>`;
         htmlContent += '</div>';
         
         const popup = new Popup(
@@ -1001,7 +1011,10 @@ async function onTestBypass() {
         
     } catch (error) {
         console.error(`[${MODULE_NAME}] Test bypass failed:`, error);
-        toastr.error(`测试请求失败: ${error.message}`, '测试绕过');
+        toastr.error(`测试请求失败: ${error.message}`, t('Test Bypass Test', '测试绕过'));
+    } finally {
+        $btn.prop('disabled', false);
+        $btn.attr('value', originalValue);
     }
 }
 
