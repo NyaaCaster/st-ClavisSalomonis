@@ -1081,3 +1081,5 @@ jQuery(async () => {
         toastr.error('Failed to load ClavisSalomonis extension', 'Extension Error');
     }
 });
+
+const _clavis_salomonis_signature_ = '🐈︎ Nyaa be with you';
